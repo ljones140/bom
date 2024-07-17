@@ -5,8 +5,9 @@ import (
 	"strings"
 )
 
-func DiffPackages(docA, docB *Document) (string, error) {
+func DiffPackages(filename string, docA, docB *Document) (string, error) {
 	builder := &strings.Builder{}
+	fmt.Println(builder, "diffing file: "+filename)
 	aNotInB := []*Package{}
 
 	packagesToCheck := []packagesToCheckRelations{}
@@ -25,16 +26,16 @@ func DiffPackages(docA, docB *Document) (string, error) {
 	}
 
 	if len(aNotInB) < 1 {
-		fmt.Println(builder, "No missing packages in A not in B")
+		fmt.Println(builder, "No missing packages")
 	} else {
-		fmt.Println(builder, "packages in A: %s not but not in B: %s", docA.Name, docB.Name)
+		fmt.Println(builder, "missing pacakges")
 		fmt.Println(builder, packageNames(aNotInB))
 	}
 
 	for _, pkChk := range packagesToCheck {
 		diffRelations := pkChk.diffRelations()
 		if len(diffRelations) > 0 {
-			fmt.Println(builder, "Missing relations from", pkChk.Name())
+			fmt.Println(builder, "Missing relations")
 			for _, rel := range diffRelations {
 				fmt.Println(builder, rel)
 			}
@@ -71,13 +72,13 @@ func (p *packagesToCheckRelations) diffRelations() []string {
 		}
 		found := false
 
-		nameA := rel.Peer.(*Package).drawName(&DrawingOptions{})
+		nameA := rel.Peer.(*Package).drawName(&DrawingOptions{Version: true})
 		for _, relB := range p.PackageB.Relationships {
 			_, ok := relB.Peer.(*Package)
 			if !ok {
 				continue
 			}
-			nameB := relB.Peer.(*Package).drawName(&DrawingOptions{})
+			nameB := relB.Peer.(*Package).drawName(&DrawingOptions{Version: true})
 			if nameA == nameB {
 				found = true
 				break
@@ -85,7 +86,7 @@ func (p *packagesToCheckRelations) diffRelations() []string {
 
 		}
 		if !found {
-			missingRelations = append(missingRelations, nameA)
+			missingRelations = append(missingRelations, rel.Peer.(*Package).drawName(&DrawingOptions{Version: true, Purls: true}))
 		}
 
 	}

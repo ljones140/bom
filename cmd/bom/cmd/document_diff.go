@@ -32,13 +32,13 @@ func AddDiff(parent *cobra.Command) {
 				return fmt.Errorf("opening docB: %w", err)
 			}
 
-			outputA, err := spdx.DiffPackages(docA, docB)
+			outputA, err := spdx.DiffPackages(args[0], docA, docB)
 			if err != nil {
 				return fmt.Errorf("Error diffing A against B %v", err)
 			}
 			fmt.Println(outputA)
 
-			outputB, err := spdx.DiffPackages(docB, docA)
+			outputB, err := spdx.DiffPackages(args[1], docB, docA)
 			if err != nil {
 				return fmt.Errorf("Error diffing B against A %v", err)
 			}
